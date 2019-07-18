@@ -1,4 +1,10 @@
-const INITIAL_STATE = {
+import React, { createContext, useState, useEffect } from 'react';
+
+import { selectCollectionsForPreview } from './shop.utils';
+
+import SHOP_DATA from './shop.data';
+
+const directory = {
   sections: [
     {
       title: 'hats',
@@ -35,11 +41,31 @@ const INITIAL_STATE = {
   ]
 };
 
-const directoryReducer = (state = INITIAL_STATE, action) => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
+export const ShopContext = createContext({
+	collections: [],
+	sections: []
+});
 
-export default directoryReducer;
+
+const ShopProvider = ({ children }) => {
+	const [ collections, setCollections ] = useState([]);
+	const [ sections, setSections ] = useState([]);
+
+	useEffect(() => {
+		setCollections(selectCollectionsForPreview(SHOP_DATA));
+		setSections(directory.sections);
+	}, [])
+
+	return (
+		<ShopContext.Provider
+			value = {{
+				collections,
+				sections
+			}}
+		>
+			{ children }
+		</ShopContext.Provider>
+	)
+}
+
+export default ShopProvider;
